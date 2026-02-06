@@ -9,11 +9,6 @@ const AdminDashboard = () => {
   const [filter, setFilter] = useState('all');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    checkAuth();
-    fetchConsignments();
-  }, [checkAuth, fetchConsignments]);
-
   const checkAuth = useCallback(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
@@ -34,7 +29,13 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  },[navigate])
+  },[navigate]);
+
+  useEffect(() => {
+    checkAuth();
+    fetchConsignments();
+  }, [checkAuth, fetchConsignments]);
+
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');

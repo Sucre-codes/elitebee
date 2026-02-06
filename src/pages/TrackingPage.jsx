@@ -48,13 +48,6 @@ const TrackingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchConsignment();
-    // Poll for updates every 30 seconds
-    const interval = setInterval(fetchConsignment, 30000);
-    return () => clearInterval(interval);
-  }, [fetchConsignment]);
-
   const fetchConsignment = useCallback(async () => {
     try {
       setLoading(true);
@@ -67,6 +60,13 @@ const TrackingPage = () => {
       setLoading(false);
     }
   },[trackingId])
+
+   useEffect(() => {
+    fetchConsignment();
+    // Poll for updates every 30 seconds
+    const interval = setInterval(fetchConsignment, 30000);
+    return () => clearInterval(interval);
+  }, [fetchConsignment]);
 
   if (loading && !consignment) {
     return (
