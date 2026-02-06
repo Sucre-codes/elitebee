@@ -5,6 +5,7 @@ import L from 'leaflet';
 import { trackConsignment } from '../utils/api';
 import { formatDate, formatRelativeTime, getStatusColor, getStatusIcon, formatStatus } from '../utils/helpers';
 import 'leaflet/dist/leaflet.css';
+import logo from '../assets/logo.png'
 
 // Fix for default marker icons in Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -115,7 +116,13 @@ const TrackingPage = () => {
               onClick={() => navigate('/')}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity"
             >
-              <div className="text-3xl">🐝</div>
+              <div className="flex items-center gap-3">
+            <img 
+              src={logo} 
+              alt="EliteBee Delivery" 
+              className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
+            />
+            </div>
               <div>
                 <h1 className="text-xl font-bold text-navy-900">EliteBee Delivery</h1>
                 <p className="text-xs text-slate-500">Premium Logistics</p>

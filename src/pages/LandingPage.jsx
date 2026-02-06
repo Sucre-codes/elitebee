@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
+import herobg from '../assets/hero.jpg'
 
 const LandingPage = () => {
   const [trackingId, setTrackingId] = useState('');
@@ -13,114 +15,213 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
-      {/* Header */}
-      <header className="pt-8 pb-4 px-6">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <div className="min-h-screen bg-slate-50">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3">
-            <div className="text-4xl">🐝</div>
+            <img 
+              src={logo} 
+              alt="EliteBee Delivery" 
+              className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
+            />
             <div>
-              <h1 className="text-2xl font-bold text-navy-900 tracking-tight">EliteBee Delivery</h1>
-              <p className="text-xs text-slate-600 font-medium">Premium Logistics</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-navy-900 tracking-tight">
+                EliteBee Delivery
+              </h1>
+              <p className="text-xs text-slate-600 font-medium hidden sm:block">
+                Premium Logistics Solutions
+              </p>
             </div>
           </div>
-          <button 
-            onClick={() => navigate('/admin')}
-            className="text-sm text-slate-600 hover:text-navy-900 font-medium transition-colors"
-          >
-            Admin
-          </button>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="px-6 py-20">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Main Heading */}
-          <div className="animate-fade-in mb-8">
-            <h2 className="text-5xl md:text-6xl font-bold text-navy-900 mb-4 leading-tight">
-              Track Your Delivery
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 to-navy-900 bg-clip-text text-transparent">
-                In Real Time
-              </span>
-            </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Premium logistics for personal gifts and family consignments. 
-              Enter your tracking ID to see your package's journey.
+      {/* Hero Section with Background Image */}
+      <section className="relative min-h-[600px] sm:min-h-[700px] flex items-center">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${herobg})`,
+            }}
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-navy-900/90 via-blue-900/85 to-slate-900/90" />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Main Heading */}
+            <div className="animate-fade-in mb-8 sm:mb-12">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
+                Professional Delivery
+                <br />
+                <span className="bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                  Tracking Excellence
+                </span>
+              </h2>
+              <p className="text-lg sm:text-xl text-slate-200 max-w-2xl mx-auto px-4">
+                Experience enterprise-grade logistics for your most valued shipments. 
+                Monitor your consignment's journey with precision and transparency.
+              </p>
+            </div>
+
+            {/* Tracking Input */}
+            <div className="animate-slide-up max-w-2xl mx-auto px-4" style={{ animationDelay: '0.1s' }}>
+              <form onSubmit={handleTrack} className="mb-8 sm:mb-12">
+                <div className="relative flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    value={trackingId}
+                    onChange={(e) => setTrackingId(e.target.value.toUpperCase())}
+                    placeholder="Enter Tracking ID"
+                    className="flex-1 px-4 sm:px-6 py-4 sm:py-5 text-base sm:text-lg border-2 border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-white/60 rounded-xl sm:rounded-2xl focus:border-blue-400 focus:ring-4 focus:ring-blue-400/30 outline-none transition-all duration-200 shadow-lg font-mono tracking-wider"
+                    style={{ letterSpacing: '0.1em' }}
+                  />
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto px-8 py-4 sm:py-5 bg-gradient-to-r from-blue-500 to-emerald-500 text-white font-semibold rounded-xl sm:rounded-2xl hover:shadow-2xl transition-all duration-300 hover:scale-105 text-base sm:text-lg"
+                  >
+                    Track Package
+                  </button>
+                </div>
+              </form>
+
+              {/* Feature Pills */}
+              <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+                <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="text-xl sm:text-2xl mr-2">📍</span>
+                  <span className="text-xs sm:text-sm font-medium text-white">Live GPS Tracking</span>
+                </div>
+                <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="text-xl sm:text-2xl mr-2">🗺️</span>
+                  <span className="text-xs sm:text-sm font-medium text-white">Route Visibility</span>
+                </div>
+                <div className="px-4 sm:px-6 py-2.5 sm:py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+                  <span className="text-xl sm:text-2xl mr-2">⏱️</span>
+                  <span className="text-xs sm:text-sm font-medium text-white">Real-Time Updates</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Indicators Section */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <h3 className="text-3xl sm:text-4xl font-bold text-navy-900 mb-4">
+              Why Choose EliteBee?
+            </h3>
+            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
+              Delivering excellence through technology, security, and professional service
             </p>
           </div>
 
-          {/* Tracking Input */}
-          <div className="animate-slide-up max-w-2xl mx-auto" style={{ animationDelay: '0.1s' }}>
-            <form onSubmit={handleTrack} className="mb-12">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={trackingId}
-                  onChange={(e) => setTrackingId(e.target.value.toUpperCase())}
-                  placeholder="Enter Tracking ID (e.g., ABC12345)"
-                  className="w-full px-6 py-5 text-lg border-2 border-slate-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm font-mono tracking-wider"
-                  style={{ letterSpacing: '0.1em' }}
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 px-8 py-3 bg-gradient-to-r from-navy-900 to-blue-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 hover:scale-105"
-                >
-                  Track
-                </button>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Feature 1 */}
+            <div className="group bg-gradient-to-br from-slate-50 to-blue-50 p-6 sm:p-8 rounded-2xl border border-slate-200 hover:border-blue-300 transition-all duration-300 hover:shadow-xl">
+              <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                🔒
               </div>
-            </form>
-
-            {/* Feature Pills */}
-            <div className="flex flex-wrap justify-center gap-4 mb-16">
-              <div className="px-6 py-3 bg-white rounded-full shadow-sm border border-slate-100">
-                <span className="text-2xl mr-2">📍</span>
-                <span className="text-sm font-medium text-slate-700">Live Location</span>
-              </div>
-              <div className="px-6 py-3 bg-white rounded-full shadow-sm border border-slate-100">
-                <span className="text-2xl mr-2">🗺️</span>
-                <span className="text-sm font-medium text-slate-700">Route Tracking</span>
-              </div>
-              <div className="px-6 py-3 bg-white rounded-full shadow-sm border border-slate-100">
-                <span className="text-2xl mr-2">✉️</span>
-                <span className="text-sm font-medium text-slate-700">Email Updates</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-              <div className="text-4xl mb-4">🔒</div>
-              <h3 className="text-lg font-semibold text-navy-900 mb-2">Secure & Private</h3>
-              <p className="text-sm text-slate-600">
-                Your tracking information is protected with enterprise-grade security
+              <h4 className="text-lg sm:text-xl font-semibold text-navy-900 mb-3">
+                Bank-Level Security
+              </h4>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                End-to-end encryption and enterprise-grade security protocols protect your sensitive shipment data
               </p>
             </div>
-            
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-lg font-semibold text-navy-900 mb-2">Fast Updates</h3>
-              <p className="text-sm text-slate-600">
-                Real-time location updates as your package moves
+
+            {/* Feature 2 */}
+            <div className="group bg-gradient-to-br from-slate-50 to-emerald-50 p-6 sm:p-8 rounded-2xl border border-slate-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-xl">
+              <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                ⚡
+              </div>
+              <h4 className="text-lg sm:text-xl font-semibold text-navy-900 mb-3">
+                Instant Notifications
+              </h4>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                Receive immediate status updates as your consignment progresses through each delivery milestone
               </p>
             </div>
-            
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-              <div className="text-4xl mb-4">💎</div>
-              <h3 className="text-lg font-semibold text-navy-900 mb-2">Premium Care</h3>
-              <p className="text-sm text-slate-600">
-                White-glove service for your most important deliveries
+
+            {/* Feature 3 */}
+            <div className="group bg-gradient-to-br from-slate-50 to-purple-50 p-6 sm:p-8 rounded-2xl border border-slate-200 hover:border-purple-300 transition-all duration-300 hover:shadow-xl sm:col-span-2 lg:col-span-1">
+              <div className="text-4xl sm:text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                💎
+              </div>
+              <h4 className="text-lg sm:text-xl font-semibold text-navy-900 mb-3">
+                Premium Handling
+              </h4>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                White-glove service with dedicated specialists for your high-value and time-sensitive deliveries
               </p>
             </div>
           </div>
         </div>
-      </main>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-navy-900 to-blue-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
+                99.8%
+              </div>
+              <div className="text-sm sm:text-base text-blue-200">
+                On-Time Delivery
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
+                24/7
+              </div>
+              <div className="text-sm sm:text-base text-blue-200">
+                Live Tracking
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
+                100%
+              </div>
+              <div className="text-sm sm:text-base text-blue-200">
+                Secure Transit
+              </div>
+            </div>
+            <div className="text-center col-span-2 lg:col-span-1">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">
+                5★
+              </div>
+              <div className="text-sm sm:text-base text-blue-200">
+                Customer Rating
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 text-center text-sm text-slate-500">
-        <p>© 2025 EliteBee Delivery. Premium logistics you can trust.</p>
+      <footer className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-slate-100 border-t border-slate-200">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <img 
+              src={logo} 
+              alt="EliteBee Delivery" 
+              className="h-8 w-8 object-contain opacity-60"
+            />
+            <p className="text-sm sm:text-base text-slate-600 font-medium">
+              EliteBee Delivery
+            </p>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-500">
+            © 2025 EliteBee Delivery. Professional logistics you can trust.
+          </p>
+        </div>
       </footer>
     </div>
   );

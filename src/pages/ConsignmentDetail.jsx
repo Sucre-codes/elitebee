@@ -129,7 +129,6 @@ const ConsignmentDetail = () => {
 
   // Create route coordinates for polyline
   const routeCoordinates = consignment.route.routeCoordinates.map(coord => [coord.lat, coord.lng]);
-  
   // Calculate bounds
   const bounds = [
     ...routeCoordinates,
