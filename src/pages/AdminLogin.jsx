@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLogin } from '../utils/api';
+import logo from '../assets/logo.png'
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
@@ -31,9 +32,15 @@ const AdminLogin = () => {
       <div className="max-w-md w-full">
         {/* Logo */}
         <div className="text-center mb-8 animate-fade-in">
-          <div className="text-6xl mb-4">🐝</div>
+          <div className="flex items-center gap-3">
+            <img 
+              src={logo} 
+              alt="EliteBee Delivery" 
+              className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
+            />
           <h1 className="text-3xl font-bold text-white mb-2">EliteBee Delivery</h1>
           <p className="text-blue-200">Admin Portal</p>
+          </div>
         </div>
 
         {/* Login Card */}
