@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -53,9 +53,9 @@ const TrackingPage = () => {
     // Poll for updates every 30 seconds
     const interval = setInterval(fetchConsignment, 30000);
     return () => clearInterval(interval);
-  }, [trackingId]);
+  }, [fetchConsignment]);
 
-  const fetchConsignment = async () => {
+  const fetchConsignment = useCallback(async () => {
     try {
       setLoading(true);
       const data = await trackConsignment(trackingId);
@@ -66,7 +66,7 @@ const TrackingPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  },[trackingId])
 
   if (loading && !consignment) {
     return (

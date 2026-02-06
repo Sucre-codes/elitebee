@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getConsignments, deleteConsignment } from '../utils/api';
 import { formatDate, formatStatus, getStatusColor, getStatusIcon } from '../utils/helpers';
@@ -12,16 +12,16 @@ const AdminDashboard = () => {
   useEffect(() => {
     checkAuth();
     fetchConsignments();
-  }, []);
+  }, [checkAuth, fetchConsignments]);
 
-  const checkAuth = () => {
+  const checkAuth = useCallback(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       navigate('/admin');
     }
-  };
+  },[navigate]);
 
-  const fetchConsignments = async () => {
+  const fetchConsignments = useCallback(async () => {
     try {
       const data = await getConsignments();
       setConsignments(data);
@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  },[navigate])
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');

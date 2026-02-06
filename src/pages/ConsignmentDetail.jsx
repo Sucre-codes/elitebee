@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -52,11 +52,7 @@ const ConsignmentDetail = () => {
     note: ''
   });
 
-  useEffect(() => {
-    fetchConsignment();
-  }, [id]);
-
-  const fetchConsignment = async () => {
+  const fetchConsignment =useCallback(async () => {
     try {
       const data = await getConsignment(id);
       setConsignment(data);
@@ -77,7 +73,11 @@ const ConsignmentDetail = () => {
         navigate('/admin');
       }
     }
-  };
+  },[id,navigate]);
+
+  useEffect(() => {
+    fetchConsignment();
+  }, [fetchConsignment]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
