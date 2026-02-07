@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { trackConsignment } from '../utils/api';
-import { formatDate, formatRelativeTime, getStatusColor, getStatusIcon, formatStatus, isFeeStatus, formatCurrency } from '../utils/helpers';
+import { formatDate, formatRelativeTime, getStatusColor, getStatusIcon, formatStatus, formatCurrency } from '../utils/helpers';
 import 'leaflet/dist/leaflet.css';
 import logo from '../assets/logo.png'
 
