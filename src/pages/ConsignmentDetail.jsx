@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { getConsignment, updateConsignment, markDelivered } from '../utils/api';
-import { formatDate, formatStatus, getStatusColor, getStatusIcon } from '../utils/helpers';
+import { formatDate, formatStatus, getStatusColor, getStatusIcon, isFeeStatus, formatCurrency } from '../utils/helpers';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default marker icons
@@ -49,7 +49,10 @@ const ConsignmentDetail = () => {
     lng: '',
     locationName: '',
     status: '',
-    note: ''
+    note: '',
+    feeAmount: '',
+    feeCurrency: 'USD',
+    feeDueDate: ''
   });
 
   const fetchConsignment =useCallback(async () => {
@@ -63,7 +66,10 @@ const ConsignmentDetail = () => {
         lng: data.currentLocation.lng,
         locationName: '',
         status: data.currentStatus,
-        note: ''
+        note: '',
+        feeAmount: '',
+        feeCurrency: 'USD',
+        feeDueDate: ''
       });
       
       setLoading(false);
@@ -92,13 +98,28 @@ const ConsignmentDetail = () => {
         locationName: updateForm.locationName,
         note: updateForm.note
       };
+
+      // Add fee details if status is fee-related
+      if (isFeeStatus(updateForm.status) && updateForm.feeAmount) {
+        updateData.feeDetails = {
+          amount: parseFloat(updateForm.feeAmount),
+          currency: updateForm.feeCurrency,
+          dueDate: updateForm.feeDueDate || undefined
+        };
+      }
       
       await updateConsignment(id, updateData);
       alert('Consignment updated successfully!');
       fetchConsignment();
       
-      // Clear note
-      setUpdateForm({ ...updateForm, note: '', locationName: '' });
+      // Clear form
+      setUpdateForm({ 
+        ...updateForm, 
+        note: '', 
+        locationName: '', 
+        feeAmount: '', 
+        feeDueDate: '' 
+      });
     } catch (err) {
       alert('Error updating consignment: ' + (err.response?.data?.error || err.message));
     }
@@ -265,6 +286,42 @@ const ConsignmentDetail = () => {
                 )}
               </div>
             </div>
+
+            {/* Pending Fees */}
+            {consignment.pendingFees && consignment.pendingFees.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                <h3 className="text-lg font-bold text-navy-900 mb-4">💳 Pending Fees</h3>
+                <div className="space-y-3">
+                  {consignment.pendingFees.map((fee, idx) => (
+                    <div key={idx} className={`p-4 rounded-lg border-l-4 ${
+                      fee.paid ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'
+                    }`}>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-sm">{formatStatus(fee.type)}</p>
+                          <p className="text-xs text-slate-600 mt-1">{fee.description}</p>
+                          {fee.dueDate && (
+                            <p className="text-xs text-slate-500 mt-1">
+                              Due: {formatDate(fee.dueDate)}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">
+                            {formatCurrency(fee.amount, fee.currency)}
+                          </p>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            fee.paid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {fee.paid ? 'Paid' : 'Unpaid'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Update Form and Timeline */}
@@ -327,13 +384,68 @@ const ConsignmentDetail = () => {
                     className="input-field"
                     required
                   >
-                    <option value="created">Created</option>
-                    <option value="in_transit">In Transit</option>
-                    <option value="out_for_delivery">Out for Delivery</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="delayed">Delayed</option>
+                    <optgroup label="Delivery Status">
+                      <option value="created">Created</option>
+                      <option value="in_transit">In Transit</option>
+                      <option value="out_for_delivery">Out for Delivery</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="delayed">Delayed</option>
+                    </optgroup>
+                    <optgroup label="Fee Requirements">
+                      <option value="customs_service_fee">💵 Customs Service Fee</option>
+                      <option value="insurance_required">🛡️ Insurance Required</option>
+                      <option value="clearance_levy_fee">📋 Local Clearance/Levy Fee</option>
+                      <option value="border_patrol_service">🛃 Border Patrol Service</option>
+                    </optgroup>
                   </select>
                 </div>
+
+                {/* Fee Amount Fields - Show only if fee status selected */}
+                {isFeeStatus(updateForm.status) && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                          Fee Amount
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={updateForm.feeAmount}
+                          onChange={(e) => setUpdateForm({ ...updateForm, feeAmount: e.target.value })}
+                          className="input-field"
+                          placeholder="500.00"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                          Currency
+                        </label>
+                        <select
+                          value={updateForm.feeCurrency}
+                          onChange={(e) => setUpdateForm({ ...updateForm, feeCurrency: e.target.value })}
+                          className="input-field"
+                        >
+                          <option value="USD">USD</option>
+                          <option value="EUR">EUR</option>
+                          <option value="GBP">GBP</option>
+                          <option value="NGN">NGN</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        Due Date (Optional)
+                      </label>
+                      <input
+                        type="date"
+                        value={updateForm.feeDueDate}
+                        onChange={(e) => setUpdateForm({ ...updateForm, feeDueDate: e.target.value })}
+                        className="input-field"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -364,18 +476,18 @@ const ConsignmentDetail = () => {
               </div>
             </div>
 
-            {/* Timeline */}
+            {/* Timeline with Deep Blue Connector */}
             <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
               <h3 className="text-lg font-bold text-navy-900 mb-4">📍 Timeline</h3>
               <div className="space-y-4">
                 {consignment.timeline.slice().reverse().map((entry, idx) => (
                   <div key={idx} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(entry.status)} text-lg`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(entry.status)} text-lg shadow-md`}>
                         {getStatusIcon(entry.status)}
                       </div>
                       {idx < consignment.timeline.length - 1 && (
-                        <div className="w-0.5 h-full bg-slate-200 mt-2"></div>
+                        <div className="w-1 h-full bg-gradient-to-b from-blue-600 to-blue-400 mt-2"></div>
                       )}
                     </div>
                     <div className="flex-1 pb-4">
@@ -383,12 +495,22 @@ const ConsignmentDetail = () => {
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getStatusColor(entry.status)}`}>
                           {formatStatus(entry.status)}
                         </span>
+                        {entry.feeDetails && (
+                          <span className="text-xs font-bold text-slate-700">
+                            {formatCurrency(entry.feeDetails.amount, entry.feeDetails.currency)}
+                          </span>
+                        )}
                       </div>
                       {entry.locationName && (
                         <p className="text-sm font-medium text-slate-700">{entry.locationName}</p>
                       )}
                       {entry.note && (
                         <p className="text-sm text-slate-600 mt-1">{entry.note}</p>
+                      )}
+                      {entry.feeDetails && entry.feeDetails.dueDate && (
+                        <p className="text-xs text-red-600 mt-1">
+                          Due: {formatDate(entry.feeDetails.dueDate)}
+                        </p>
                       )}
                       <p className="text-xs text-slate-500 mt-1">{formatDate(entry.timestamp)}</p>
                     </div>

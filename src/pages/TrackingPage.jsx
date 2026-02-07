@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { trackConsignment } from '../utils/api';
-import { formatDate, formatRelativeTime, getStatusColor, getStatusIcon, formatStatus } from '../utils/helpers';
+import { formatDate, formatRelativeTime, getStatusColor, getStatusIcon, formatStatus, isFeeStatus, formatCurrency } from '../utils/helpers';
 import 'leaflet/dist/leaflet.css';
 import logo from '../assets/logo.png'
 
@@ -106,6 +106,9 @@ const TrackingPage = () => {
     [consignment.currentLocation.lat, consignment.currentLocation.lng]
   ];
 
+  // Check if there are any pending fees
+  const hasPendingFees = consignment.pendingFees && consignment.pendingFees.some(fee => !fee.paid);
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -148,6 +151,13 @@ const TrackingPage = () => {
           </div>
         </div>
       </header>
+
+      {/* Pending Fees Alert */}
+      {hasPendingFees && (
+        <div className="bg-red-600 text-white py-3 px-6 text-center">
+          <p className="font-semibold">⚠️ Action Required: Payment pending for delivery to proceed</p>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -217,6 +227,54 @@ const TrackingPage = () => {
 
           {/* Info Section */}
           <div className="order-1 lg:order-2 space-y-6">
+            {/* Pending Fees Card */}
+            {consignment.pendingFees && consignment.pendingFees.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-red-200">
+                <h3 className="text-lg font-bold text-navy-900 mb-4">💳 Payment Required</h3>
+                <div className="space-y-3">
+                  {consignment.pendingFees.map((fee, idx) => (
+                    <div key={idx} className={`p-4 rounded-lg border-l-4 ${
+                      fee.paid ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'
+                    }`}>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold text-sm flex items-center gap-2">
+                            <span>{getStatusIcon(fee.type)}</span>
+                            {formatStatus(fee.type)}
+                          </p>
+                          {fee.description && (
+                            <p className="text-xs text-slate-600 mt-1">{fee.description}</p>
+                          )}
+                          {fee.dueDate && (
+                            <p className="text-xs text-red-600 mt-1 font-semibold">
+                              Due: {formatDate(fee.dueDate)}
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-lg">
+                            {formatCurrency(fee.amount, fee.currency)}
+                          </p>
+                          <span className={`text-xs px-2 py-1 rounded font-semibold ${
+                            fee.paid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                            {fee.paid ? '✓ Paid' : 'Unpaid'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {hasPendingFees && (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> Please contact our support team to complete payment and resume delivery.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Cargo Details */}
             {consignment.cargoDetails && (
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
@@ -259,31 +317,41 @@ const TrackingPage = () => {
               </div>
             </div>
 
-            {/* Timeline */}
+            {/* Timeline with Deep Blue Connector */}
             <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
               <h3 className="text-lg font-bold text-navy-900 mb-4">📍 Tracking Timeline</h3>
               <div className="space-y-4">
                 {consignment.timeline.slice().reverse().map((entry, idx) => (
                   <div key={idx} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(entry.status)} text-lg`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(entry.status)} text-lg shadow-md`}>
                         {getStatusIcon(entry.status)}
                       </div>
                       {idx < consignment.timeline.length - 1 && (
-                        <div className="w-0.5 h-full bg-slate-200 mt-2"></div>
+                        <div className="w-1 h-full bg-gradient-to-b from-blue-600 to-blue-400 mt-2 shadow-sm"></div>
                       )}
                     </div>
                     <div className="flex-1 pb-4">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
                         <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${getStatusColor(entry.status)}`}>
                           {formatStatus(entry.status)}
                         </span>
+                        {entry.feeDetails && (
+                          <span className="text-xs font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded">
+                            {formatCurrency(entry.feeDetails.amount, entry.feeDetails.currency)}
+                          </span>
+                        )}
                       </div>
                       {entry.locationName && (
                         <p className="text-sm font-medium text-slate-700">{entry.locationName}</p>
                       )}
                       {entry.note && (
                         <p className="text-sm text-slate-600 mt-1">{entry.note}</p>
+                      )}
+                      {entry.feeDetails && entry.feeDetails.dueDate && (
+                        <p className="text-xs text-red-600 mt-1 font-semibold">
+                          Payment Due: {formatDate(entry.feeDetails.dueDate)}
+                        </p>
                       )}
                       <p className="text-xs text-slate-500 mt-1">{formatDate(entry.timestamp)}</p>
                     </div>
